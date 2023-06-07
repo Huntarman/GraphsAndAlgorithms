@@ -1,0 +1,3 @@
+C:/Users/micha/CLionProjects/SDiZO-Project-2/Code/cmake-build-debug/CMakeFiles/SDiZO_Project_2.dir
+C:/Users/micha/CLionProjects/SDiZO-Project-2/Code/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/micha/CLionProjects/SDiZO-Project-2/Code/cmake-build-debug/CMakeFiles/rebuild_cache.dir
