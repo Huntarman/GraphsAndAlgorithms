@@ -18,8 +18,10 @@ public:
     Edge* edges;
     Vortex* MST;
     bool MSTcreated = false;
-    Edge nullEdge = Edge(0,0,-1);
+    Edge nullEdge = Edge(0,0,0);
     int mst_weight=0;
+    Edge* IncidenceMatrix;
+    Edge* EDGESMST;
 
 public:
     Graph();
@@ -30,7 +32,7 @@ public:
     void printGraphList();
     void printMSTList();
     void printGraphMatrix();
-    void printMSTMatrix();
+    void createMST();
     void mstKruskal();
     void mstKruskalMatrix();
     void mstPrim();
@@ -41,7 +43,7 @@ public:
 
 private:
     bool hasCycle(Edge* edges, int edgeCount);
-    void printMatrix(Vortex* listVor, int n);
+    void printMatrix(Edge* listVor, int n);
     void unvisit();
 };
 

@@ -18,6 +18,7 @@ Graph::Graph() {
     this->vortices = (Vortex*) malloc(0);
     this->edges = (Edge*) malloc(0);
     this->MST = (Vortex*) malloc(0);
+    IncidenceMatrix = (Edge*) malloc(0);
 }
 void Graph::addVortex() {
     auto newVortex = Vortex(next_ID);
@@ -120,8 +121,6 @@ void Graph::addMultipleEdges(double percentage) {
 
 void Graph::mstKruskal() {
     //its alive!!
-    delete[] MST;
-    MSTcreated = true;
     PriorityQueue queue;
     for (int i = 0; i < next_ID; i++){
         for (int j = 0; j < vortices[i].getEdgeAmount(); j++) {
@@ -129,11 +128,7 @@ void Graph::mstKruskal() {
         }
     }
     int mstEdgesCount = 0;
-    MST = (Vortex*) malloc(next_ID * sizeof(Vortex));
     Edge* mstEdges = (Edge*) malloc(0);
-    for (int i = 0; i<next_ID;i++) {
-        MST[i] = Vortex(i);
-    }
     int i = 0;
     while (mstEdgesCount != next_ID - 1){
         mstEdgesCount++;
@@ -146,34 +141,21 @@ void Graph::mstKruskal() {
         }
         i++;
     }
-    for (int j = 0; j < mstEdgesCount; j++) {
-        mst_weight += mstEdges[j].capacity;
-        int a = mstEdges[j].source;
-        int b = mstEdges[j].destination;
-        int c = mstEdges[j].capacity;
-        MST[a].addEdge(Edge(a,b,c));
-        MST[b].addEdge(Edge(b,a,c));
-    }
+    EDGESMST = mstEdges;
 }
 
 void Graph::mstKruskalMatrix() {
     //its dead!!
-    delete[] MST;
-    MSTcreated = true;
     PriorityQueue queue;
     for (int i = 0; i < next_ID; i++){
-        for (int j = 0; j < next_ID; j++) {
-            if (vortices[i].edgesMatrix[j].capacity == -1) continue;
-
-            queue.push(vortices[i].edgesMatrix[j]);
+        for (int j = 0; j < edgeAmount; j++) {
+            if (IncidenceMatrix[i * edgeAmount + j].capacity != 0) {
+                queue.push(IncidenceMatrix[i * edgeAmount + j]);
+            }
         }
     }
     int mstEdgesCount = 0;
-    MST = (Vortex*) malloc(next_ID * sizeof(Vortex));
     Edge* mstEdges = (Edge*) malloc(0);
-    for (int i = 0; i<next_ID;i++) {
-        MST[i] = Vortex(i);
-    }
     int i = 0;
     while (mstEdgesCount != next_ID - 1){
         mstEdgesCount++;
@@ -186,14 +168,7 @@ void Graph::mstKruskalMatrix() {
         }
         i++;
     }
-    for (int j = 0; j < mstEdgesCount; j++) {
-        mst_weight += mstEdges[j].capacity;
-        int a = mstEdges[j].source;
-        int b = mstEdges[j].destination;
-        int c = mstEdges[j].capacity;
-        MST[a].addEdge(Edge(a,b,c));
-        MST[b].addEdge(Edge(b,a,c));
-    }
+    EDGESMST = mstEdges;
 }
 
 void Graph::printMSTList() {
@@ -226,37 +201,37 @@ void Graph::mstPrim() {
 void Graph::mstPrimMatrix() {
     mstPrimMatrix(distribution(generator)%next_ID);
 }
-void Graph::printMatrix(Vortex* listVor, int n) {
-    std::cout<<"\t";
-    for (int i = 0; i < n; i++) {
-        std::cout<<i<<"\t";
+void Graph::printMatrix(Edge* listVor, int n) {
+    std::cout<<"E:\t";
+    for (int j = 0; j < n; ++j) {
+        std::cout<<j<<"\t";
     }
     std::cout<<"\n";
-    for (int i = 0; i < n; i++){
-        std::cout<<i<<"\t";
-        int list[n];
-        for (int j = 0; j<n;j++){
-            list[j] = 0;
-        }
-        for (int k = 0; k < listVor[i].getEdgeAmount(); k++) {
-            list[listVor[i].edges[k].destination] = listVor[i].edges[k].capacity;
-        }
-        for (int j = 0; j < n; j++) {
-            if (j == i) std::cout<<"-\t";
-            else{
-                std::cout<<list[j]<<"\t";
-            }
+    for (int i = 0; i < next_ID; ++i) {
+        std::cout<<"V:"<<i<<"|\t";
+        for (int j = 0; j < n; ++j) {
+            std::cout<<listVor[ i * n + j].capacity<<"\t";
         }
         std::cout<<"\n";
     }
 }
 
-void Graph::printMSTMatrix() {
-    if (!MSTcreated){
-        std::cout<<"MST not created yet!\n";
-        return;
+void Graph::createMST(){
+    delete[] MST;
+    mst_weight = 0;
+    MSTcreated = true;
+    MST = (Vortex*) malloc(next_ID*sizeof(Vortex));
+    for (int i = 0; i < next_ID; i++) {
+        MST[i] = Vortex(i);
     }
-    printMatrix(MST, next_ID);
+    for (int j = 0; j < next_ID - 1; j++) {
+        mst_weight += EDGESMST[j].capacity;
+        int a = EDGESMST[j].source;
+        int b = EDGESMST[j].destination;
+        int c = EDGESMST[j].capacity;
+        MST[a].addEdge(Edge(a,b,c));
+        MST[b].addEdge(Edge(b,a,c));
+    }
 }
 
 void Graph::printGraphMatrix() {
@@ -264,7 +239,7 @@ void Graph::printGraphMatrix() {
         std::cout<<"Graph Empty\n";
         return;
     }
-    printMatrix(vortices, next_ID);
+    printMatrix(IncidenceMatrix, edgeAmount);
 }
 
 void Graph::mstPrim(int start) {
@@ -272,13 +247,6 @@ void Graph::mstPrim(int start) {
         std::cout<<"Incorrect vortex chosen!\n";
         return;
     }
-    delete[] MST;
-    MSTcreated = true;
-    MST = (Vortex*) malloc(next_ID*sizeof(Vortex));
-    for (int i = 0; i < next_ID; i++) {
-        MST[i] = Vortex(i);
-    }
-
     int mstEdgesCount = 0;
     int vorID = start;
     PriorityQueue prioQu = PriorityQueue();
@@ -300,25 +268,13 @@ void Graph::mstPrim(int start) {
             mstEdges = (Edge*) realloc( mstEdges,mstEdgesCount * sizeof(Edge));
         }
     }
-
-    for (int i = 0; i < next_ID-1; i++) {
-        mst_weight += mstEdges[i].capacity;
-        int a = mstEdges[i].source; int b = mstEdges[i].destination; int c = mstEdges[i].capacity;
-        MST[a].addEdge(Edge(a,b,c));
-        MST[b].addEdge(Edge(b,a,c));
-    }
+    EDGESMST = mstEdges;
     unvisit();
 }
 void Graph::mstPrimMatrix(int start) {
     if (start < 0 || start >= next_ID){
         std::cout<<"Incorrect vortex chosen!\n";
         return;
-    }
-    delete[] MST;
-    MSTcreated = true;
-    MST = (Vortex*) malloc(next_ID*sizeof(Vortex));
-    for (int i = 0; i < next_ID; i++) {
-        MST[i] = Vortex(i);
     }
     int mstEdgesCount = 0;
     int vorID = start;
@@ -327,9 +283,9 @@ void Graph::mstPrimMatrix(int start) {
     while (mstEdgesCount != next_ID - 1){
         if (!vortices[vorID].visited) {
             vortices[vorID].visited = true;
-            for (int i = 0; i < next_ID; i++) {
-                if (vortices[vorID].edgesMatrix[i].capacity == 0) continue;
-                prioQu.push(vortices[vorID].edgesMatrix[i]);
+            for (int i = 0; i < edgeAmount; i++) {
+                if (IncidenceMatrix[vorID * edgeAmount + i].capacity == 0) continue;
+                prioQu.push(IncidenceMatrix[vorID * edgeAmount + i]);
             }
         }
         mstEdgesCount++;
@@ -342,18 +298,20 @@ void Graph::mstPrimMatrix(int start) {
             mstEdges = (Edge*) realloc( mstEdges,mstEdgesCount * sizeof(Edge));
         }
     }
-
-    for (int i = 0; i < next_ID-1; i++) {
-        mst_weight += mstEdges[i].capacity;
-        int a = mstEdges[i].source; int b = mstEdges[i].destination; int c = mstEdges[i].capacity;
-        MST[a].addEdge(Edge(a,b,c));
-        MST[b].addEdge(Edge(b,a,c));
-    }
+    EDGESMST = mstEdges;
     unvisit();
 }
 void Graph::createMatrix() {
+    delete[] IncidenceMatrix;
+    IncidenceMatrix =(Edge*) malloc( next_ID * edgeAmount * sizeof(Edge));
     for (int i = 0; i < next_ID; ++i) {
-        vortices[i].createEdgeMatrix(next_ID,nullEdge);
+        for (int j = 0; j < edgeAmount; ++j) {
+            IncidenceMatrix[ i * (edgeAmount) + j] = nullEdge;
+        }
+    }
+    for (int j = 0; j < edgeAmount; ++j) {
+        IncidenceMatrix[edges[j].source * edgeAmount + j] = edges[j];
+        IncidenceMatrix[edges[j].destination * edgeAmount + j] = Edge(edges[j].destination,edges[j].source,edges[j].capacity);
     }
 }
 

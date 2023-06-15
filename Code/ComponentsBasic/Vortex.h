@@ -18,12 +18,9 @@ public:
 public:
     Vortex(int index);
     void addEdge(Edge edge);
-    void createEdgeMatrix(int size, Edge nullEdge);
     void deleteEdges();
     void printEdges();
     long getEdgeAmount();
-
-
 };
 
 

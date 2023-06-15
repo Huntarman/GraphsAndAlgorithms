@@ -19,7 +19,8 @@ public:
     int edgeAmount;
     int edgeCap;
     bool SPPcreated = false;
-    Edge nullEdge = Edge(0,0,-1);
+    Edge nullEdge = Edge(0,0,0);
+    Edge* IncidenceMatrix;
 
 public:
     DirectedGraph();
@@ -42,7 +43,7 @@ public:
     void printSPPcost();
 
 private:
-    void printMatrix(Vortex* listVor, int n);
+    void printMatrix(Edge* listVor, int n);
     void unvisit();
 };
 

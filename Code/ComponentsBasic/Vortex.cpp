@@ -8,7 +8,7 @@
 Vortex::Vortex(int index) {
     this->index = index;
     edgeAmountVortex = 0;
-    edges = (Edge *) malloc(0 * sizeof(Edge));
+    edges = (Edge *) malloc(0);
     edgesMatrix = (Edge *) malloc(0 * sizeof(Edge));
 }
 
@@ -30,19 +30,6 @@ void Vortex::deleteEdges() {
     free(edges);
     edges = (Edge*) malloc(0);
     edgeAmountVortex = 0;
-}
-
-void Vortex::createEdgeMatrix(int size, Edge nullEdge) {
-    delete[] edgesMatrix;
-    edgesMatrix = (Edge*) malloc( size * sizeof(Edge));
-
-    for (int i = 0; i < size; i++) {
-        edgesMatrix[i] = nullEdge;
-    }
-    for (int i = 0; i < edgeAmountVortex; i++) {
-        Edge pom = edges[i];
-        edgesMatrix[pom.destination] = pom;
-    }
 }
 
 long Vortex::getEdgeAmount() {

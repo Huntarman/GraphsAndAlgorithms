@@ -49,7 +49,7 @@ void PriorityQueue::pop() {
 
 void PriorityQueue::printQueue(){
     for(int i = 0; i < size; i++){
-        std::cout<<heap[i].capacity<<"\n";
+        std::cout<<heap[i].source<<"|"<<heap[i].destination<<"|"<<heap[i].capacity<<"\n";
     }
     std::cout<<"\n";
 }

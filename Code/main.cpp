@@ -87,8 +87,6 @@ void undirectedGraph() {
         graph.printGraphMatrix();
         cout<<"\nMST - List:\n";
         graph.printMSTList();
-        cout<<"\nMST - Matrix:\n";
-        graph.printMSTMatrix();
         cout<<"MST cost: "<<graph.mst_weight<<"\n";
         int cond = 0;
         cout<<"\n___UNDIRECTED_GRAPH___\n";
@@ -155,18 +153,22 @@ void undirectedGraph() {
 
             case 6:
                 graph.mstKruskal();
+                graph.createMST();
                 break;
 
             case 7:
                 graph.mstKruskalMatrix();
+                graph.createMST();
                 break;
 
             case 8:
                 graph.mstPrim();
+                graph.createMST();
                 break;
 
             case 9:
                 graph.mstPrimMatrix();
+                graph.createMST();
                 break;
 
             case 0:

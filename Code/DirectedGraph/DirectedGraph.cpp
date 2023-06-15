@@ -15,6 +15,7 @@ DirectedGraph::DirectedGraph(){
     this->edges = (Edge*) malloc(0);
     this->vortices = (Vortex*) malloc(0);
     this->SPP = (VortexPath*) malloc(0);
+    this->IncidenceMatrix = (Edge*) malloc(0);
     this->next_ID = 0;
     this->edgeAmount = 0;
     this->edgeCap = 0;
@@ -110,29 +111,19 @@ void DirectedGraph::printGraphMatrix() {
         std::cout<<"Graph Empty\n";
         return;
     }
-    printMatrix(vortices,next_ID);
+    printMatrix(IncidenceMatrix,edgeAmount);
 }
 
-void DirectedGraph::printMatrix(Vortex *listVor, int n) {
-    std::cout<<"\t";
-    for (int i = 0; i < n; i++) {
-        std::cout<<i<<"\t";
+void DirectedGraph::printMatrix(Edge *listVor, int n) {
+    std::cout<<"E:\t";
+    for (int j = 0; j < n; ++j) {
+        std::cout<<j<<"\t";
     }
     std::cout<<"\n";
-    for (int i = 0; i < n; i++){
-        std::cout<<i<<"\t";
-        int list[n];
-        for (int j = 0; j<n;j++){
-            list[j] = 0;
-        }
-        for (int k = 0; k < listVor[i].getEdgeAmount(); k++) {
-            list[listVor[i].edges[k].destination] = listVor[i].edges[k].capacity;
-        }
-        for (int j = 0; j < n; j++) {
-            if (j == i) std::cout<<"-\t";
-            else{
-                std::cout<<list[j]<<"\t";
-            }
+    for (int i = 0; i < next_ID; ++i) {
+        std::cout<<"V:"<<i<<"|\t";
+        for (int j = 0; j < n; ++j) {
+            std::cout<<listVor[ i * n + j].capacity<<"\t";
         }
         std::cout<<"\n";
     }
@@ -242,11 +233,11 @@ void DirectedGraph::SPPBelFordMatrix(int start) {
 
             if (SPP[j].parent == -1) continue;
 
-            for (int k = 0; k < next_ID; k++) {
-                Edge pom = vortices[j].edgesMatrix[k];
-                if(pom.capacity == -1) continue;
-                if((SPP[j].pathWeight + pom.capacity) < SPP[pom.destination].pathWeight){
-                    SPP[pom.destination].pathWeight = SPP[j].pathWeight + pom.capacity;
+            for (int k = 0; k < edgeAmount; k++) {
+                Edge pom = IncidenceMatrix[k + j * edgeAmount];
+                if(pom.capacity >= 0) continue;
+                if((SPP[j].pathWeight + (-1 * pom.capacity)) < SPP[pom.destination].pathWeight){
+                    SPP[pom.destination].pathWeight = SPP[j].pathWeight + (-1 * pom.capacity);
                     SPP[pom.destination].parent = j;
                     changes++;
                 }
@@ -270,14 +261,14 @@ void DirectedGraph::SPPDijkstraMatrix(int start) {
     int idCurr = start;
     for (int i = 0; i < next_ID; i++){
         SPP[idCurr].visited = true;
-        for (int j = 0; j < next_ID; j++){
-            Edge pom = vortices[idCurr].edgesMatrix[j];
-            if (pom.capacity == -1) continue;
-
-            if((SPP[idCurr].pathWeight + pom.capacity) < SPP[pom.destination].pathWeight){
-                SPP[pom.destination].pathWeight = SPP[idCurr].pathWeight + pom.capacity;
+        for (int j = 0; j < edgeAmount; j++){
+            Edge pom = IncidenceMatrix[j + idCurr * edgeAmount];
+            if (pom.capacity >= 0) continue;
+            if((SPP[idCurr].pathWeight + (-1 * pom.capacity)) < SPP[pom.destination].pathWeight){
+                SPP[pom.destination].pathWeight = SPP[idCurr].pathWeight + (-1 * pom.capacity);
                 SPP[pom.destination].parent = idCurr;
             }
+
         }
         PriorityQueue prioQu = PriorityQueue(false);
 
@@ -292,8 +283,15 @@ void DirectedGraph::SPPDijkstraMatrix(int start) {
 }
 
 void DirectedGraph::createMatrix() {
+    IncidenceMatrix =(Edge*) realloc(IncidenceMatrix, next_ID * edgeAmount * sizeof(Edge));
     for (int i = 0; i < next_ID; ++i) {
-        vortices[i].createEdgeMatrix(next_ID,nullEdge);
+        for (int j = 0; j < edgeAmount; ++j) {
+            IncidenceMatrix[ i * (edgeAmount) + j] = nullEdge;
+        }
+    }
+    for (int j = 0; j < edgeAmount; ++j) {
+        IncidenceMatrix[edges[j].source * edgeAmount + j] = Edge(edges[j].source,edges[j].destination, -1 * edges[j].capacity);
+        IncidenceMatrix[edges[j].destination * edgeAmount + j] = edges[j];
     }
 }
 
