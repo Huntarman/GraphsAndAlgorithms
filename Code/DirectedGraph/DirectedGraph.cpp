@@ -135,6 +135,7 @@ void DirectedGraph::SPPDijkstra() {
 
 void DirectedGraph::SPPDijkstra(int start) {
     delete[] SPP;
+    recentStart = start;
     SPPcreated = true;
     SPP = (VortexPath*) malloc( next_ID * sizeof(VortexPath));
     for (int i = 0; i < next_ID; i++){
@@ -147,20 +148,23 @@ void DirectedGraph::SPPDijkstra(int start) {
     for (int i = 0; i < next_ID; i++){
         SPP[idCurr].visited = true;
         for (int j = 0; j < vortices[idCurr].getEdgeAmount(); j++){
+
             Edge pom = vortices[idCurr].edges[j];
             if((SPP[idCurr].pathWeight + pom.capacity) < SPP[pom.destination].pathWeight){
                 SPP[pom.destination].pathWeight = SPP[idCurr].pathWeight + pom.capacity;
                 SPP[pom.destination].parent = idCurr;
             }
         }
-        PriorityQueue prioQu = PriorityQueue(false);
 
+        PriorityQueue prioQu = PriorityQueue(false);
         for(int j = 0; j < next_ID; j++){
             if (SPP[j].visited) continue;
             if (SPP[j].parent == -1) continue;
             prioQu.pushSPP(SPP[j]);
         }
+        if (prioQu.sizeSPP == 0) break;
         idCurr = prioQu.topSPP().id;
+        if (SPP[idCurr].parent == -1) break;
     }
     unvisit();
 }
@@ -171,6 +175,7 @@ void DirectedGraph::SPPBelFord() {
 
 void DirectedGraph::SPPBelFord(int start) {
     delete[] SPP;
+    recentStart = start;
     SPPcreated = true;
     SPP = (VortexPath*) malloc( next_ID * sizeof(VortexPath));
     for (int i = 0; i < next_ID; i++){
@@ -220,6 +225,7 @@ void DirectedGraph::SPPBelFordMatrix() {
 void DirectedGraph::SPPBelFordMatrix(int start) {
     delete[] SPP;
     SPPcreated = true;
+    recentStart = start;
     SPP = (VortexPath*) malloc( next_ID * sizeof(VortexPath));
     for (int i = 0; i < next_ID; i++){
         SPP[i] = VortexPath(i, INT32_MAX, -1);
@@ -251,6 +257,7 @@ void DirectedGraph::SPPBelFordMatrix(int start) {
 void DirectedGraph::SPPDijkstraMatrix(int start) {
     delete[] SPP;
     SPPcreated = true;
+    recentStart = start;
     SPP = (VortexPath*) malloc( next_ID * sizeof(VortexPath));
     for (int i = 0; i < next_ID; i++){
         SPP[i] = VortexPath(i, INT32_MAX, -1);
@@ -277,7 +284,10 @@ void DirectedGraph::SPPDijkstraMatrix(int start) {
             if (SPP[j].parent == -1) continue;
             prioQu.pushSPP(SPP[j]);
         }
+
+        if (prioQu.sizeSPP == 0) break;
         idCurr = prioQu.topSPP().id;
+        if (SPP[idCurr].parent == -1) break;
     }
     unvisit();
 }
@@ -305,7 +315,27 @@ void DirectedGraph::printSPPcost() {
     if (!SPPcreated) return;
     int cost = 0;
     for (int i = 0; i < next_ID; ++i) {
-        cost += SPP[i].pathWeight;
+        if (SPP[i].parent != -1) cost += SPP[i].pathWeight;
     }
     std::cout<<"Cost: "<<cost<<"\n";
+}
+void DirectedGraph::printPaths(){
+    if (!SPPcreated) return;
+    for (int i = 0; i < next_ID; ++i) {
+        int first = SPP[i].parent;
+        std::cout<< "V: "<< i;
+        if (first == -1 ){
+            std::cout<<"| NO PATH\n";
+            continue;
+        }
+        if (first == -2 || i == recentStart) std::cout<<"| Start Vortex\n";
+        else {
+            std::cout << "|Path: " << i << " <- ";
+            while (first != -2) {
+                if (first != recentStart) std::cout << first << " <- ";
+                else std::cout << first << " | END\n";
+                first = SPP[first].parent;
+            }
+        }
+    }
 }

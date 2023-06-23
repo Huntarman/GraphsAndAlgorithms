@@ -21,7 +21,7 @@ public:
     bool SPPcreated = false;
     Edge nullEdge = Edge(0,0,0);
     Edge* IncidenceMatrix;
-
+    int recentStart;
 public:
     DirectedGraph();
     void addEdge(Edge edge);
@@ -41,6 +41,7 @@ public:
     void printSPPList();
     void createMatrix();
     void printSPPcost();
+    void printPaths();
 
 private:
     void printMatrix(Edge* listVor, int n);

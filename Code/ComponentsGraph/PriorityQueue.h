@@ -10,7 +10,7 @@
 #include "../ComponentsDirectedGraph/VortexPath.h"
 
 class PriorityQueue {
-private:
+public:
     Edge* heap;
     VortexPath* SPPnext;
     int size;

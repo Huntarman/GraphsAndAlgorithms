@@ -5,7 +5,12 @@
 #include "VortexPath.h"
 
 void VortexPath::print() {
-    std::cout<<"ID:"<<id<<"| D:"<< pathWeight<< " P:";
+    std::cout<<"ID:"<<id<<"| ";
+    if (parent == -1){
+        std::cout<<"Path not found!\n";
+        return;
+    }
+    std::cout<<"D:"<< pathWeight<< " P:";
     if (parent == -2){
         std::cout<<"-";
     }

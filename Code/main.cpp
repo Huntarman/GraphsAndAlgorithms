@@ -201,6 +201,8 @@ void directedGraph() {
         cout<<"\nMST - List:\n";
         graph.printSPPList();
         graph.printSPPcost();
+        cout<<"PATHS: \n";
+        graph.printPaths();
         int cond = 0;
         cout<<"\n___DIRECTED_GRAPH___\n";
         cout<<"1 - Add vortex\n";
